@@ -115,11 +115,9 @@
     function sendToTelegram() {
       const username = document.getElementById('username').value.trim();
       const country = document.getElementById('country').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const phone = document.getElementById('phone').value.trim();
       const status = document.getElementById('statusMsg');
 
-      if (!username || !country || !email || !phone) {
+      if (!username || !country ) {
         status.textContent = 'Please fill in all required fields!';
         status.style.color = 'orange';
         return;
@@ -164,13 +162,12 @@
 
       document.getElementById('mainTitle').textContent = isEnglish ? ' تسجيل في المسابقة' : ' Competition Registration';
       document.getElementById('mainText').textContent = isEnglish ? 'يرجى إدخال معلوماتك للمشاركة:' : 'Please enter your information to join the event:';
-      document.getElementById('username').placeholder = isEnglish ? ' الاسم الكامل ' : 'Your full name';
-      document.getElementById('phone').placeholder = isEnglish ? 'رقم الهاتف' : 'Phone Number';
-      document.getElementById('email').placeholder = isEnglish ? 'البريد الإلكتروني' : 'Email Address';
+      document.getElementById('username').placeholder = isEnglish ? 'اسمك داخل العبة ' : 'Your HR username';
       document.querySelector("button").textContent = isEnglish ? 'إرسال' : 'Submit';
       document.getElementById('langToggle').textContent = isEnglish ? 'EN' : 'AR';
     }
   </script>
 </body>
 </html>
+
 
