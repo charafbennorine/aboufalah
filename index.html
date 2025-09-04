@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>aboufalah</title>
+  <title>Russi</title>
   <style>
     body {
       background-color: #0d0d0d;
@@ -69,7 +69,9 @@
     <h2 id="mainTitle"> Competition Registration</h2>
     <p id="mainText">Please enter your information to join the event:</p>
 
-    <input type="text" id="username" placeholder="Your full name">
+    <input type="text" id="username" placeholder="Your HR username">
+    <input type="text" id="email" placeholder="Email Address">
+    <input type="text" id="phone" placeholder="Phone Number">
 
     <select id="country">
       <option value="" disabled selected>🌍 Select Country</option>
@@ -112,11 +114,11 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const registeredUsername = localStorage.getItem('registered_username');
-      if (registeredUsername) {
+      const registeredPhone = localStorage.getItem('registered_phone');
+      if (registeredPhone) {
         document.getElementById('statusMsg').textContent = '✅ لقد قمت بالتسجيل بلفعل!';
         document.getElementById('statusMsg').style.color = 'lightgreen';
-        document.querySelector('button').disabled = true;
+        document.querySelector('button').disabled = true; // Disable the submit button
       }
     });
 
@@ -132,20 +134,13 @@
     }
 
     async function checkAndSend() {
-      const username = document.getElementById('username').value.trim();
-      const registeredUsername = localStorage.getItem('registered_username');
-      const status = document.getElementById('statusMsg');
+      const phone = document.getElementById('phone').value.trim();
+      const registeredPhone = localStorage.getItem('registered_phone');
 
-      if (!username || username === "") {
-        status.textContent = 'الرجاء إدخال الاسم.';
-        status.style.color = 'orange';
-        return;
-      }
-
-      if (registeredUsername && registeredUsername === username) {
-        status.textContent = '✅you're already submitted!';
+      if (registeredPhone && registeredPhone === phone) {
+        const status = document.getElementById('statusMsg');
+        status.textContent = '✅ لقد قمت بالتسجيل بلفعل بنفس رقم الهاتف!';
         status.style.color = 'lightgreen';
-        document.querySelector('button').disabled = true;
         return;
       }
       sendToTelegram();
@@ -156,7 +151,7 @@
       const country = document.getElementById('country').value.trim();
       const status = document.getElementById('statusMsg');
 
-      if (!username || !country) {
+      if (!username || !country || !email || !phone) {
         status.textContent = 'الرجاء ملء جميع الحقول المطلوبة!';
         status.style.color = 'orange';
         return;
@@ -181,10 +176,11 @@
       .then(response => response.json())
       .then(data => {
         if (data.ok) {
-          localStorage.setItem('registered_username', username);
+          localStorage.setItem('registered_phone', phone);
           status.textContent = '✅ تم تسجيلك بنجاح!';
           status.style.color = 'lightgreen';
           document.querySelector('button').disabled = true;
+          // You can also add window.close(); here if you want to close the page after registration
         } else {
           status.textContent = `❌ فشل الإرسال. الخطأ: ${data.description}`;
           status.style.color = 'red';
@@ -202,13 +198,10 @@
 
       document.getElementById('mainTitle').textContent = isEnglish ? ' تسجيل في المسابقة' : ' Competition Registration';
       document.getElementById('mainText').textContent = isEnglish ? 'يرجى إدخال معلوماتك للمشاركة:' : 'Please enter your information to join the event:';
-      document.getElementById('username').placeholder = isEnglish ? 'اسمك في لعبة' : 'Your HR username';
+      document.getElementById('username').placeholder = isEnglish ? 'اسم المستخدم HR الخاص بك' : 'Your HR username';
       document.querySelector("button").textContent = isEnglish ? 'إرسال' : 'Submit';
       document.getElementById('langToggle').textContent = isEnglish ? 'EN' : 'AR';
     }
   </script>
 </body>
 </html>
-
-
-
